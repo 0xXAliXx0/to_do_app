@@ -1,0 +1,1 @@
+gcc -o my_program test.c $(pkg-config --cflags --libs glfw3) -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lm
