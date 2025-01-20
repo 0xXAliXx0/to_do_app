@@ -1,4 +1,4 @@
-#include <GL/glew.h>//wrong error works fine
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <math.h>
@@ -114,61 +114,69 @@ int main()
     // Vertices coordinates
     GLfloat vertices[] =
     {
-        -0.5f, -0.5f * (float)sqrt(3) / 3, 0.0f, // Lower left corner
-        0.5f, -0.5f * (float)sqrt(3) / 3, 0.0f, // Lower right corner
-        0.0f, 0.5f * (float)sqrt(3) * 2 / 3, 0.0f // Upper corner
+        -0.5f, -0.5f , 0.0f, // Lower left corner
+         0.5f, -0.5f , 0.0f, // Lower right corner
+         0.5f, 0.5f , 0.0f, // Upper right corner
+        -0.5f, 0.5f , 0.0f // Upper left corner
+    };
+    GLuint indices[] = 
+    {
+      0, 1, 3,
+      1, 2, 3
     };
 
     // Create reference containers for the Vertex Array Object and the Vertex Buffer Object
-    GLuint VAO, VBO;
+    GLuint VAO, VBO, EBO;
+glGenVertexArrays(1, &VAO);
+glGenBuffers(1, &VBO);
+glGenBuffers(1, &EBO);
 
-    // Generate the VAO and VBO with only 1 object each
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+// Bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+glBindVertexArray(VAO);
 
-    // Make the VAO the current Vertex Array Object by binding it
-    glBindVertexArray(VAO);
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // Bind the VBO specifying it's a GL_ARRAY_BUFFER
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // Introduce the vertices into the VBO
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    // Configure the Vertex Attribute so that OpenGL knows how to read the VBO
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    // Enable the Vertex Attribute so that OpenGL knows to use it
-    glEnableVertexAttribArray(0);
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);
 
-    // Bind both the VBO and VAO to 0 so that we don't accidentally modify the VAO and VBO we created
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+// Unbind the VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
+glBindVertexArray(0);
 
-    // Main while loop
-    while (!glfwWindowShouldClose(window))
-    {
-        // Specify the color of the background
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-        // Clean the back buffer and assign the new color to it
-        glClear(GL_COLOR_BUFFER_BIT);
-        // Tell OpenGL which Shader Program we want to use
-        glUseProgram(shaderProgram);
-        // Bind the VAO so OpenGL knows to use it
-        glBindVertexArray(VAO);
-        // Draw the triangle using the GL_TRIANGLES primitive
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        // Swap the back buffer with the front buffer
-        glfwSwapBuffers(window);
-        // Take care of all GLFW events
-        glfwPollEvents();
-    }
+// Render loop
+while (!glfwWindowShouldClose(window))
+{
+    // Input
+    // -----
+   // processInput(window);
 
-    // Delete all the objects we've created
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
-    // Delete window before ending the program
-    glfwDestroyWindow(window);
-    // Terminate GLFW before ending the program
-    glfwTerminate();
-    return 0;
+    // Render
+    // ------
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Draw our first triangle
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO); // Seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+    // -------------------------------------------------------------------------------
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+}
+
+// optional: de-allocate all resources once they've outlived their purpose:
+// ------------------------------------------------------------------------
+glDeleteVertexArrays(1, &VAO);
+glDeleteBuffers(1, &VBO);
+glDeleteBuffers(1, &EBO);
+
+// glfw: terminate, clearing all previously allocated GLFW resources.
+// ------------------------------------------------------------------
+glfwTerminate();
+return 0;
 }
