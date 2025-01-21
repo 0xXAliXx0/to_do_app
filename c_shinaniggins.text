@@ -1,0 +1,28 @@
+let jeff = {value:boolean = false}//the {} means that jeff is an obj and will be passsed by refrence
+function is_jeff_fucked(o:boolean)
+{
+ return true
+}
+
+
+is_jeff_fucked(jeff)
+
+
+
+
+
+
+//example of an pointer in c
+#$include <stdio.h>
+#include <jeff_is_fucked>
+int jeff = 0;
+int *ptr = &jeff;
+int main(is_fucked,jeff)
+{
+  if(is_fucked!)
+  {
+    jeff_is_fucked(jeff);
+
+  }else return jeff_is_virgin();
+  
+}
